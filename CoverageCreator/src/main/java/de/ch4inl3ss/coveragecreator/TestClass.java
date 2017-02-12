@@ -8,4 +8,12 @@ public class TestClass {
 		}
 		return fib(n - 1) + fib(n - 2);
 	}
+
+	public String hello(String s) {
+		if (s.equals("hello")) {
+			return "bye";
+		}
+		return s;
+	}
+
 }
