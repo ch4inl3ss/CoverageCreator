@@ -17,12 +17,16 @@ import org.apache.commons.lang.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+
 public class TestGeneratorTest {
 
 	private static final String CORRECT_FILENAME = "/Users/Felix/git/CoverageCreator/CoverageCreator/src/main/java/de/ch4inl3ss/coveragecreator/TestClass.java";
 
 	private static final String REFERENCE_TESTCLASS = "/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/TestClassTest.java";
 	private static final String EXPECTED_TESTFILE = "/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/java/de/ch4inl3ss/coveragecreator/TestClassTest.java";
+	private static final String EXPECTED_XML = "/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/hello0.xml";
 
 	private TestGenerator testGenerator;
 
@@ -48,6 +52,18 @@ public class TestGeneratorTest {
 			}
 		}
 		assertThat(expectedMethods.toArray(), is(equalTo(foundMethods)));
+	}
+
+	@Test
+	public void shouldGenerateObjectArrayFile() throws Exception {
+		File file = new File(EXPECTED_XML);
+		testGenerator.writeObjectArrayToXMLFile(CORRECT_FILENAME, new Object[] { "HALLO" },
+				TestClass.class.getMethod("hello", String.class), 0);
+
+		String string = FileUtils.readFileToString(file, Charset.defaultCharset());
+		XStream xstream = new XStream(new StaxDriver());
+		Object[] object = (Object[]) xstream.fromXML(string);
+		assertThat(object[0], is(equalTo("HALLO")));
 	}
 
 	@Test

@@ -3,14 +3,22 @@ package de.ch4inl3ss.coveragecreator;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+
 public class TestGenerator {
 
 	private PathFindingService pathFindingService = new PathFindingService();
+
+	private ClassService classService = new ClassService();
+
+	private Invoker invoker = new Invoker();
 
 	public Method[] findMethodsOfSystemUnderTest(String fileName) {
 		return new ClassService().findMethods(fileName, pathFindingService.findPackageName(fileName) + "."
@@ -40,7 +48,7 @@ public class TestGenerator {
 	private void generateSetup(String fileName, List<String> lines) {
 		lines.add("@Before");
 		lines.add("public void setUp() {");
-		lines.add(pathFindingService.findClassNameWithoutFileExtension(fileName).toLowerCase() + " = new "
+		lines.add(getSystemUnderTestVariableName(fileName) + " = new "
 				+ pathFindingService.findClassNameWithoutFileExtension(fileName) + "();");
 		lines.add("}");
 		lines.add("");
@@ -48,7 +56,7 @@ public class TestGenerator {
 
 	private void generateSystemUnderTest(String fileName, List<String> lines) {
 		lines.add("private " + pathFindingService.findClassNameWithoutFileExtension(fileName) + " "
-				+ pathFindingService.findClassNameWithoutFileExtension(fileName).toLowerCase() + ";");
+				+ getSystemUnderTestVariableName(fileName) + ";");
 		lines.add("");
 	}
 
@@ -66,10 +74,7 @@ public class TestGenerator {
 		generateSetup(fileName, lines);
 
 		for (Method method : findMethodsOfSystemUnderTest(fileName)) {
-			lines.add("@Test");
-			lines.add("public void test" + turnFirstLetterToUpperCase(method.getName()) + "() {");
-			lines.add("");
-			lines.add("}");
+			generateTestMethod(lines, method, fileName);
 		}
 
 		generateClassEnd(lines);
@@ -78,7 +83,43 @@ public class TestGenerator {
 
 	}
 
+	private void generateTestMethod(List<String> lines, Method method, String fileName) {
+		lines.add("@Test");
+		lines.add("public void test" + turnFirstLetterToUpperCase(method.getName()) + "() {");
+
+		// generate method-call
+		// lines.add(getSystemUnderTestVariableName(fileName) + "." +
+		// method.getName() + "();");
+
+		// Map contains the
+		// invoker.invokeMethod(classS, method, parameters)
+
+		// each array in this list is a separate testcase with an assert
+		List<Object[]> paramterListForMethod = invoker.findParamterListForMethod(method, fileName);
+		writeObjectArrayToXMLFile(fileName, paramterListForMethod.get(0), method, 0);
+
+		lines.add("");
+		lines.add("}");
+	}
+
+	private String getSystemUnderTestVariableName(String fileName) {
+		return pathFindingService.findClassNameWithoutFileExtension(fileName).toLowerCase();
+	}
+
 	private String turnFirstLetterToUpperCase(String string) {
 		return string.substring(0, 1).toUpperCase() + string.substring(1);
 	}
+
+	public void writeObjectArrayToXMLFile(String fileName, Object[] objectArray, Method method, int parameterNumber) {
+		String pathForXML = pathFindingService.findPathForXML(fileName);
+		XStream xstream = new XStream(new StaxDriver());
+		String xml = xstream.toXML(objectArray);
+		File file = new File(pathForXML + method.getName() + parameterNumber + ".xml");
+		try {
+			FileUtils.writeStringToFile(file, xml, Charset.defaultCharset());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

@@ -10,8 +10,12 @@ import org.junit.Test;
 public class PathFindingServiceTest {
 
 	private static final String CORRECT_FILENAME = "/Users/Felix/git/CoverageCreator/CoverageCreator/src/main/java/de/ch4inl3ss/coveragecreator/TestClass.java";
+	private static final String ANOTHER_CORRECT_FILENAME = "/Users/Felix/git/legacyExample/legacyExample/src/main/java/de/ch4inl3ss/aktivitaet/Aktivitaet.java";
 	private static final String FALSE_FILENAME_1 = "/de/ch4inl3ss/coveragecreator/TestClass.java";
 	private static final String FALSE_FILENAME_2 = "src/main/java/de/ch4inl3ss/coveragecreator/TestClass";
+
+	private static final String XML_PATH = "/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/";
+	private static final String ANOTHER_XML_PATH = "/Users/Felix/git/legacyExample/legacyExample/src/test/resources/";
 
 	private PathFindingService pathFindingService;
 
@@ -57,5 +61,14 @@ public class PathFindingServiceTest {
 	public void shouldFindPackageName() throws Exception {
 		String packageName = pathFindingService.findPackageName(CORRECT_FILENAME);
 		assertThat(packageName, is(equalTo("de.ch4inl3ss.coveragecreator")));
+	}
+
+	@Test
+	public void shouldFindPathForXML() throws Exception {
+		String pathForXML = pathFindingService.findPathForXML(CORRECT_FILENAME);
+		assertThat(pathForXML, is(equalTo(XML_PATH)));
+		pathForXML = pathFindingService.findPathForXML(ANOTHER_CORRECT_FILENAME);
+		assertThat(pathForXML, is(equalTo(ANOTHER_XML_PATH)));
+
 	}
 }

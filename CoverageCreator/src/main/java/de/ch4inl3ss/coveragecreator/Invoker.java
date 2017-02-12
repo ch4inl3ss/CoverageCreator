@@ -61,6 +61,7 @@ public class Invoker {
 				List<List<Object>> lists = new ArrayList<>();
 				for (Object[] objects : listValues) {
 					for (Object object : objects) {
+						@SuppressWarnings("rawtypes")
 						List list = new ArrayList<>();
 						list.add(object);
 						lists.add(list);
@@ -82,7 +83,6 @@ public class Invoker {
 	 * @param fileName
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<Object[]> findParamterListForMethod(Method method, String fileName) {
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		List<Object[]> parameters = new ArrayList<>();

@@ -4,6 +4,7 @@ public class PathFindingService {
 	private static final String JAVA_FILEEXTENSION = ".java";
 	private static final String SRC_MAIN_JAVA = "src/main/java";
 	private static final String SRC_TEST_JAVA = "src/test/java";
+	private static final String SRC_TEST_RESOURCES = "src/test/resources";
 
 	public boolean checkFileName(String fileName) {
 		if (!fileName.contains(SRC_MAIN_JAVA)) {
@@ -43,6 +44,11 @@ public class PathFindingService {
 		String withoutInitialSlash = withoutSrcMainJava.substring(1);
 		String withoutLastSlash = withoutInitialSlash.substring(0, withoutInitialSlash.length() - 1);
 		return withoutLastSlash.replace("/", ".");
+	}
+
+	public String findPathForXML(String fileName) {
+		String srcTestResources = fileName.replace(SRC_MAIN_JAVA, SRC_TEST_RESOURCES);
+		return srcTestResources.split(SRC_TEST_RESOURCES + "/")[0] + SRC_TEST_RESOURCES + "/";
 	}
 
 }
