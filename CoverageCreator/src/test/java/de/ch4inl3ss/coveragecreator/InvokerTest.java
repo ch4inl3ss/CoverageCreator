@@ -28,7 +28,12 @@ public class InvokerTest {
 	public void shouldCreateAndFillComplexTypes() throws Exception {
 		List<Object[]> result = invoker.findParamterListForMethod(
 				TestClass.class.getMethod("changeComplexType", ComplexType.class), CORRECT_FILENAME);
-		assertThat(result.get(0), is(instanceOf(ComplexType.class)));
+		System.out.println(ReflectionToStringBuilder.toString(result));
+		assertThat(result.get(0)[0], is(instanceOf(ComplexType.class)));
+		assertThat(result.get(1)[0], is(instanceOf(ComplexType.class)));
+		assertThat(result.get(2)[0], is(instanceOf(ComplexType.class)));
+		assertThat(result.get(3)[0], is(instanceOf(ComplexType.class)));
+		assertThat(result.get(4)[0], is(instanceOf(ComplexType.class)));
 
 	}
 
@@ -36,7 +41,6 @@ public class InvokerTest {
 	public void shouldFindCorrectParameterListForMethod() throws Exception {
 		List<Object[]> result = invoker.findParamterListForMethod(TestClass.class.getMethod("fib", int.class),
 				CORRECT_FILENAME);
-		System.out.println(ReflectionToStringBuilder.toString(result.get(0)));
 		result = invoker.findParamterListForMethod(TestClass.class.getMethod("hello", String.class), CORRECT_FILENAME);
 		assertThat("test", is(equalTo(result.get(0)[0])));
 		assertThat("asdf", is(equalTo(result.get(1)[0])));

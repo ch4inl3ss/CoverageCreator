@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import de.ch4inl3ss.coveragecreator.constants.Parameters;
 
@@ -33,8 +32,8 @@ public class Invoker {
 			try {
 				Object instance = clazz.newInstance();
 				for (Method method : parameterLists.keySet()) {
-					System.out.println(method);
-					System.out.println(ReflectionToStringBuilder.toString(parameterLists.get(method).get(i)));
+					// System.out.println(method);
+					// System.out.println(ReflectionToStringBuilder.toString(parameterLists.get(method).get(i)));
 					method.invoke(instance, parameterLists.get(method).get(i));
 				}
 				complexObjects.add(instance);
@@ -48,6 +47,7 @@ public class Invoker {
 		return complexObjects.toArray(new Object[complexObjects.size()]);
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Object[]> findParametersForClass(Method method, String fileName, Class<?> clazz) {
 		List<Object[]> parameters = new ArrayList<>();
 		Object[] parametersArray = Parameters.getParameters(clazz);
@@ -58,11 +58,15 @@ public class Invoker {
 			} else if (clazz.equals(List.class)) {
 				Class<?> typeOfList = classService.findTypeOfList(method);
 				List<Object[]> listValues = findParametersForClass(method, fileName, typeOfList);
-				List list = new ArrayList<>();
+				List<List<Object>> lists = new ArrayList<>();
 				for (Object[] objects : listValues) {
-					list.add(objects[0]);
+					for (Object object : objects) {
+						List list = new ArrayList<>();
+						list.add(object);
+						lists.add(list);
+					}
 				}
-				parametersArray = new Object[] { list };
+				parametersArray = lists.toArray(new Object[lists.size()]);
 			} else {
 				parametersArray = fillComplexType(clazz, fileName);
 			}
