@@ -2,6 +2,8 @@ package de.ch4inl3ss.coveragecreator;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -28,6 +30,17 @@ public class ClassService {
 		return withClassFile;
 	}
 
+	public Method[] findGetterMethods(Class<?> clazz) {
+		List<Method> getterMethods = new ArrayList<>();
+		for (Method method : findRealMethodsInClass(clazz)) {
+			if (method.getName().startsWith("get")) {
+				getterMethods.add(method);
+			}
+		}
+		return getterMethods.toArray(new Method[getterMethods.size()]);
+
+	}
+
 	public Method[] findMethods(String fileName, String className) {
 		try {
 			return returnMethodsOfClassInClassPath(className);
@@ -50,17 +63,8 @@ public class ClassService {
 	private Method[] findMethodsOfClassNotInClassPath(String className, String fileName) {
 		File classFile = new File(findClassFileDirectorToFile(fileName));
 
-		try {
-			URL url = classFile.toURI().toURL();
-			URL[] urls = new URL[] { url };
-			ClassLoader classLoader = URLClassLoader.newInstance(urls);
-			Class<?> clazz = classLoader.loadClass(className);
-			return findRealMethodsInClass(clazz);
-
-		} catch (MalformedURLException | ClassNotFoundException e) {
-			e.printStackTrace();
-			return new Method[0];
-		}
+		Class<?> clazz = loadClass(className, classFile);
+		return findRealMethodsInClass(clazz);
 
 	}
 
@@ -73,6 +77,43 @@ public class ClassService {
 			}
 		}
 		return realMethods.toArray(new Method[realMethods.size()]);
+	}
+
+	public Method[] findSetterMethods(Class<?> clazz) {
+		List<Method> getterMethods = new ArrayList<>();
+		for (Method method : findRealMethodsInClass(clazz)) {
+			if (method.getName().startsWith("set")) {
+				getterMethods.add(method);
+			}
+		}
+		return getterMethods.toArray(new Method[getterMethods.size()]);
+
+	}
+
+	public Class<?> findTypeOfList(Method method) {
+		Type[] types = method.getGenericParameterTypes();
+		ParameterizedType pType = (ParameterizedType) types[0];
+		Class<?> clazz = (Class<?>) pType.getActualTypeArguments()[0];
+		return clazz;
+	}
+
+	private Class<?> loadClass(String className, File classFile) {
+		try {
+			@SuppressWarnings("rawtypes")
+			Class clazz = Class.forName(className);
+			return clazz;
+		} catch (ClassNotFoundException e) {
+			URL url;
+			try {
+				url = classFile.toURI().toURL();
+				URL[] urls = new URL[] { url };
+				ClassLoader classLoader = URLClassLoader.newInstance(urls);
+				Class<?> clazz = classLoader.loadClass(className);
+				return clazz;
+			} catch (MalformedURLException | ClassNotFoundException e1) {
+				return null;
+			}
+		}
 	}
 
 	private Method[] returnMethodsOfClassInClassPath(String className) throws ClassNotFoundException {

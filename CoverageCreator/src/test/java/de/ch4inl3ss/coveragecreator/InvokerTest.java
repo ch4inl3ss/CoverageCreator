@@ -5,13 +5,13 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.ch4inl3ss.coveragecreator.constants.Parameters;
+import de.ch4inl3ss.coveragecreator.testclasses.ComplexType;
 
 public class InvokerTest {
 
@@ -26,6 +26,9 @@ public class InvokerTest {
 
 	@Test
 	public void shouldCreateAndFillComplexTypes() throws Exception {
+		List<Object[]> result = invoker.findParamterListForMethod(
+				TestClass.class.getMethod("changeComplexType", ComplexType.class), CORRECT_FILENAME);
+		assertThat(result.get(0), is(instanceOf(ComplexType.class)));
 
 	}
 
@@ -33,18 +36,23 @@ public class InvokerTest {
 	public void shouldFindCorrectParameterListForMethod() throws Exception {
 		List<Object[]> result = invoker.findParamterListForMethod(TestClass.class.getMethod("fib", int.class),
 				CORRECT_FILENAME);
-		assertThat(Arrays.deepEquals(result.get(0), Parameters.intValues), is(true));
+		System.out.println(ReflectionToStringBuilder.toString(result.get(0)));
 		result = invoker.findParamterListForMethod(TestClass.class.getMethod("hello", String.class), CORRECT_FILENAME);
-		assertThat("hello".equals(result.get(0)[0]), is(true));
-		assertThat("bye".equals(result.get(0)[1]), is(true));
+		assertThat("test", is(equalTo(result.get(0)[0])));
+		assertThat("asdf", is(equalTo(result.get(1)[0])));
+		assertThat("hello", is(equalTo(result.get(2)[0])));
+		assertThat("bye", is(equalTo(result.get(3)[0])));
 	}
 
 	@Test
 	public void shouldFindStringsInClass() throws Exception {
 		Object[] stringsInClass = invoker.findStringsInClass(CORRECT_FILENAME);
-		assertThat(stringsInClass.length, is(equalTo(2)));
-		assertThat(stringsInClass[0], is(equalTo("hello")));
-		assertThat(stringsInClass[1], is(equalTo("bye")));
+		assertThat(stringsInClass.length, is(equalTo(4)));
+
+		assertThat(stringsInClass[0], is(equalTo("test")));
+		assertThat(stringsInClass[1], is(equalTo("asdf")));
+		assertThat(stringsInClass[2], is(equalTo("hello")));
+		assertThat(stringsInClass[3], is(equalTo("bye")));
 	}
 
 	@Test

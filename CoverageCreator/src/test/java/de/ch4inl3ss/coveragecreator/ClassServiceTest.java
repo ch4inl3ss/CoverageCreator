@@ -5,9 +5,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import de.ch4inl3ss.coveragecreator.testclasses.AnotherComplexType;
+import de.ch4inl3ss.coveragecreator.testclasses.ComplexType;
 
 public class ClassServiceTest {
 
@@ -41,5 +45,28 @@ public class ClassServiceTest {
 
 		assertThat(methods.length, is(equalTo(1)));
 		assertThat(methods[0].getName().equals("ausfuehrenImplementierung"), is(true));
+	}
+
+	@Test
+	public void shouldFindGetterMethods() throws Exception {
+		Method[] methods = classService.findGetterMethods(ComplexType.class);
+		assertThat(methods.length, is(equalTo(5)));
+
+	}
+
+	@Test
+	public void shouldFindSetterMethods() throws Exception {
+		Method[] methods = classService.findGetterMethods(ComplexType.class);
+		assertThat(methods.length, is(equalTo(5)));
+
+	}
+
+	@Test
+	public void shouldFindTypeOfList() throws Exception {
+		Class<?> typeOfList = classService.findTypeOfList(ComplexType.class.getMethod("setStrings", List.class));
+		assertThat(typeOfList, is(equalTo(String.class)));
+		typeOfList = classService
+				.findTypeOfList(ComplexType.class.getMethod("setListOfAnotherComplexType", List.class));
+		assertThat(typeOfList, is(equalTo(AnotherComplexType.class)));
 	}
 }
