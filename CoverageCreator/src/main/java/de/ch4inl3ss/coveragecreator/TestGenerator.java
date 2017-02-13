@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -34,9 +36,23 @@ public class TestGenerator {
 		lines.add("");
 	}
 
+	private void generateFields(List<String> lines) {
+		lines.add("private XStream xstream;");
+		lines.add("");
+	}
+
 	private void generateImports(List<String> lines) {
+		lines.add("import static org.hamcrest.MatcherAssert.assertThat;");
+		lines.add("import static org.hamcrest.CoreMatchers.is;");
+		lines.add("import static org.hamcrest.CoreMatchers.equalTo;");
+		lines.add("import java.io.File;");
+		lines.add("import java.lang.reflect.Method;");
+		lines.add("import java.nio.charset.Charset;");
+		lines.add("import org.apache.commons.io.FileUtils;");
 		lines.add("import org.junit.Before;");
 		lines.add("import org.junit.Test;");
+		lines.add("import com.thoughtworks.xstream.XStream;");
+		lines.add("import com.thoughtworks.xstream.io.xml.StaxDriver;");
 		lines.add("");
 	}
 
@@ -50,6 +66,7 @@ public class TestGenerator {
 		lines.add("public void setUp() {");
 		lines.add(getSystemUnderTestVariableName(fileName) + " = new "
 				+ pathFindingService.findClassNameWithoutFileExtension(fileName) + "();");
+		lines.add("xstream = new XStream(new StaxDriver());");
 		lines.add("}");
 		lines.add("");
 	}
@@ -66,14 +83,16 @@ public class TestGenerator {
 			FileUtils.deleteQuietly(outputFile);
 		}
 
-		List<String> lines = new ArrayList<>();
+		LinkedList<String> lines = new LinkedList<>();
 		generatePackageDeclaration(fileName, lines);
 		generateImports(lines);
 		generateClassStart(fileName, lines);
 		generateSystemUnderTest(fileName, lines);
+		generateFields(lines);
 		generateSetup(fileName, lines);
-
-		for (Method method : findMethodsOfSystemUnderTest(fileName)) {
+		Method[] methodsOfSystemUnderTest = findMethodsOfSystemUnderTest(fileName);
+		sortMethods(methodsOfSystemUnderTest);
+		for (Method method : methodsOfSystemUnderTest) {
 			generateTestMethod(lines, method, fileName);
 		}
 
@@ -83,38 +102,111 @@ public class TestGenerator {
 
 	}
 
-	private void generateTestMethod(List<String> lines, Method method, String fileName) {
+	private void generateTestMethod(LinkedList<String> lines, Method method, String fileName) {
 		lines.add("@Test");
-		lines.add("public void test" + turnFirstLetterToUpperCase(method.getName()) + "() {");
+		lines.add("public void test" + turnFirstLetterToUpperCase(method.getName()) + "() throws Exception {");
+		lines.add("Object[] params;");
 
-		// generate method-call
-		// lines.add(getSystemUnderTestVariableName(fileName) + "." +
-		// method.getName() + "();");
+		String parameterClasses = getMethodParameterClassNamesAsString(method, lines);
 
-		// Map contains the
-		// invoker.invokeMethod(classS, method, parameters)
+		lines.add("Method testMethod = " + getSystemUnderTestVariableName(fileName) + ".getClass().getMethod(\""
+				+ method.getName() + "\"," + parameterClasses + " );");
+		lines.add("Object result;");
+		lines.add("Object expectedResult;");
 
 		// each array in this list is a separate testcase with an assert
 		List<Object[]> paramterListForMethod = invoker.findParamterListForMethod(method, fileName);
-		writeObjectArrayToXMLFile(fileName, paramterListForMethod.get(0), method, 0);
 
+		for (int i = 0; i < paramterListForMethod.size(); i++) {
+			writeParamterObjectArrayToXMLFile(fileName, paramterListForMethod.get(i), method, i);
+
+			// Invoke the method to get result
+			Object resultObject = invoker.invokeMethod(method.getDeclaringClass(), method,
+					paramterListForMethod.get(i));
+			writeResultObjectToXMLFile(fileName, resultObject, method, i);
+
+			lines.add("File fileParam" + i + " = new File(\"" + pathFindingService.findPathForXML(fileName)
+					+ method.getName() + i + ".xml\");");
+
+			lines.add("File fileResult" + i + " = new File(\"" + pathFindingService.findPathForXML(fileName)
+					+ method.getName() + "Result" + i + ".xml\");");
+
+			lines.add("params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam" + i
+					+ ", Charset.defaultCharset()));");
+			lines.add("expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult" + i
+					+ ", Charset.defaultCharset()));");
+			lines.add("try {");
+			lines.add("result = testMethod.invoke(" + getSystemUnderTestVariableName(fileName) + ", params);");
+
+			// generate assert-statement
+			lines.add("assertThat(result, is(equalTo(expectedResult)));");
+
+			lines.add("} catch (Exception | Error e) {");
+			lines.add("result = e;");
+			lines.add("}");
+		}
 		lines.add("");
 		lines.add("}");
+		lines.add("");
+	}
+
+	private String getMethodParameterClassNamesAsString(Method method, LinkedList<String> lines) {
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		String parameterClasses = "";
+		for (Class<?> clazz : parameterTypes) {
+			insertImportIfNotThereYet(lines, clazz);
+			parameterClasses += clazz.getSimpleName() + ".class,";
+		}
+		parameterClasses = parameterClasses.substring(0, parameterClasses.length() - 1);
+		return parameterClasses;
 	}
 
 	private String getSystemUnderTestVariableName(String fileName) {
 		return pathFindingService.findClassNameWithoutFileExtension(fileName).toLowerCase();
 	}
 
+	private void insertImportIfNotThereYet(LinkedList<String> lines, Class<?> classToImport) {
+		String importString = "import " + classToImport.getName() + ";";
+		for (String line : lines) {
+			if (line.contains(importString) || classToImport.isPrimitive()) {
+				return;
+			}
+		}
+		lines.add(2, importString);
+	}
+
+	private void sortMethods(Method[] methodsOfSystemUnderTest) {
+		Arrays.sort(methodsOfSystemUnderTest, new Comparator<Method>() {
+
+			@Override
+			public int compare(Method o1, Method o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+	}
+
 	private String turnFirstLetterToUpperCase(String string) {
 		return string.substring(0, 1).toUpperCase() + string.substring(1);
 	}
 
-	public void writeObjectArrayToXMLFile(String fileName, Object[] objectArray, Method method, int parameterNumber) {
+	public void writeParamterObjectArrayToXMLFile(String fileName, Object[] objectArray, Method method,
+			int parameterNumber) {
 		String pathForXML = pathFindingService.findPathForXML(fileName);
 		XStream xstream = new XStream(new StaxDriver());
 		String xml = xstream.toXML(objectArray);
 		File file = new File(pathForXML + method.getName() + parameterNumber + ".xml");
+		try {
+			FileUtils.writeStringToFile(file, xml, Charset.defaultCharset());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeResultObjectToXMLFile(String fileName, Object resultObject, Method method, int parameterNumber) {
+		String pathForXML = pathFindingService.findPathForXML(fileName);
+		XStream xstream = new XStream(new StaxDriver());
+		String xml = xstream.toXML(resultObject);
+		File file = new File(pathForXML + method.getName() + "Result" + parameterNumber + ".xml");
 		try {
 			FileUtils.writeStringToFile(file, xml, Charset.defaultCharset());
 		} catch (IOException e) {

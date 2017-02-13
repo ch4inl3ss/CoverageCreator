@@ -57,7 +57,7 @@ public class TestGeneratorTest {
 	@Test
 	public void shouldGenerateObjectArrayFile() throws Exception {
 		File file = new File(EXPECTED_XML);
-		testGenerator.writeObjectArrayToXMLFile(CORRECT_FILENAME, new Object[] { "HALLO" },
+		testGenerator.writeParamterObjectArrayToXMLFile(CORRECT_FILENAME, new Object[] { "HALLO" },
 				TestClass.class.getMethod("hello", String.class), 0);
 
 		String string = FileUtils.readFileToString(file, Charset.defaultCharset());
@@ -75,9 +75,9 @@ public class TestGeneratorTest {
 		List<String> generatedLines = FileUtils.readLines(generatedFile, Charset.defaultCharset());
 		assertThat(referenceLines.size(), is(equalTo(generatedLines.size())));
 		for (int i = 0; i < referenceLines.size(); i++) {
-			assertThat(referenceLines.get(i).trim().equals(generatedLines.get(i).trim()), is(true));
+			assertThat(referenceLines.get(i).trim(), is(equalTo(generatedLines.get(i).trim())));
 		}
 
-		FileUtils.deleteQuietly(generatedFile);
+		// FileUtils.deleteQuietly(generatedFile);
 	}
 }
