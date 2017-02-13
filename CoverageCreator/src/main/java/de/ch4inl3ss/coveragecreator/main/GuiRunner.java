@@ -1,8 +1,10 @@
 package de.ch4inl3ss.coveragecreator.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import de.ch4inl3ss.coveragecreator.TestGenerator;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,14 +23,16 @@ public class GuiRunner extends Application {
 		Application.launch(args);
 	}
 
+	private TestGenerator testGenerator = new TestGenerator();
+
 	@Override
 	public void start(Stage stage) throws Exception {
 		stage.setTitle("File Chooser Sample");
 
 		final FileChooser fileChooser = new FileChooser();
 
-		final Button openButton = new Button("Open a Picture...");
-		final Button openMultipleButton = new Button("Open Pictures...");
+		final Button openButton = new Button("Generate Test for File");
+		final Button openMultipleButton = new Button("Generate Testfiles for multiple files...");
 
 		openButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -36,6 +40,11 @@ public class GuiRunner extends Application {
 				File file = fileChooser.showOpenDialog(stage);
 				if (file != null) {
 					System.out.println(file);
+					try {
+						testGenerator.generateTestFile(file.getAbsolutePath());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
 		});

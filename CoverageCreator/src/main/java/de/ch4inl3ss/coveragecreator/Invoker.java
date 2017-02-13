@@ -28,7 +28,7 @@ public class Invoker {
 		}
 
 		// TODO find a better way to create the right number of instances
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 8; i++) {
 			try {
 				Object instance = clazz.newInstance();
 				for (Method method : parameterLists.keySet()) {
@@ -92,7 +92,7 @@ public class Invoker {
 
 		List<Object[]> resultParameterSet = new ArrayList<>();
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 8; i++) {
 			List<Object> parameterSet = new ArrayList<>();
 			for (Object[] parameterArray : parameters) {
 				parameterSet.add(parameterArray[i]);

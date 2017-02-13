@@ -82,6 +82,36 @@ assertThat(result, is(equalTo(expectedResult)));
 } catch (Exception | Error e) {
 result = e;
 }
+File fileParam5 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/changeComplexType5.xml");
+File fileResult5 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/changeComplexTypeResult5.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam5, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult5, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam6 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/changeComplexType6.xml");
+File fileResult6 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/changeComplexTypeResult6.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam6, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult6, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam7 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/changeComplexType7.xml");
+File fileResult7 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/changeComplexTypeResult7.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam7, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult7, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
 
 }
 
@@ -141,6 +171,36 @@ assertThat(result, is(equalTo(expectedResult)));
 } catch (Exception | Error e) {
 result = e;
 }
+File fileParam5 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/fib5.xml");
+File fileResult5 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/fibResult5.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam5, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult5, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam6 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/fib6.xml");
+File fileResult6 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/fibResult6.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam6, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult6, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam7 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/fib7.xml");
+File fileResult7 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/fibResult7.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam7, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult7, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
 
 }
 
@@ -194,6 +254,36 @@ File fileParam4 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src
 File fileResult4 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/helloResult4.xml");
 params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam4, Charset.defaultCharset()));
 expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult4, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam5 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/hello5.xml");
+File fileResult5 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/helloResult5.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam5, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult5, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam6 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/hello6.xml");
+File fileResult6 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/helloResult6.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam6, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult6, Charset.defaultCharset()));
+try {
+result = testMethod.invoke(testclass, params);
+assertThat(result, is(equalTo(expectedResult)));
+} catch (Exception | Error e) {
+result = e;
+}
+File fileParam7 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/hello7.xml");
+File fileResult7 = new File("/Users/Felix/git/CoverageCreator/CoverageCreator/src/test/resources/helloResult7.xml");
+params =  (Object[]) xstream.fromXML(FileUtils.readFileToString(fileParam7, Charset.defaultCharset()));
+expectedResult =  (Object) xstream.fromXML(FileUtils.readFileToString(fileResult7, Charset.defaultCharset()));
 try {
 result = testMethod.invoke(testclass, params);
 assertThat(result, is(equalTo(expectedResult)));
